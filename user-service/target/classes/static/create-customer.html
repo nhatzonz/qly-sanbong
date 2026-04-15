@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo khách hàng</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 20px; }
+        .back-btn {
+            background: none;
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #4361ee; border-color: #4361ee; color: #fff; }
+        .container { max-width: 520px; margin: 48px auto; padding: 0 16px; }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+            padding: 36px;
+        }
+        h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 28px; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-bottom: 18px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: #4361ee; }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #4361ee;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #3a52d4; }
+        .msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+        .msg.success { background: #d4edda; color: #155724; }
+        .msg.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Quản Lý San Bóng</h1>
+    <a class="back-btn" href="/customers.html">← Danh sách khách hàng</a>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Tạo Khách Hàng Mới</h2>
+
+        <label for="idCustomer">Mã khách hàng</label>
+        <input type="text" id="idCustomer" placeholder="VD: KH001" maxlength="20" />
+
+        <label for="name">Họ tên</label>
+        <input type="text" id="name" placeholder="Nhập họ tên" />
+
+        <label for="phone">Số điện thoại</label>
+        <input type="text" id="phone" placeholder="VD: 0901234567" />
+
+        <label for="address">Địa chỉ</label>
+        <input type="text" id="address" placeholder="Nhập địa chỉ" />
+
+        <button class="btn-submit" onclick="createCustomer()">Tạo khách hàng</button>
+        <div class="msg" id="msg"></div>
+    </div>
+</div>
+
+<script>
+    if (!sessionStorage.getItem('staffName')) {
+        window.location.href = '/login.html';
+    }
+
+    async function createCustomer() {
+        const idCustomer = document.getElementById('idCustomer').value.trim();
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const msg = document.getElementById('msg');
+
+        msg.style.display = 'none';
+
+        try {
+            const res = await fetch('http://localhost:8081/api/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idCustomer, name, phone, address })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                msg.className = 'msg success';
+                msg.textContent = `Tạo thành công! Mã khách hàng: ${data.customerId}`;
+                msg.style.display = 'block';
+                document.getElementById('idCustomer').value = '';
+                document.getElementById('name').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('address').value = '';
+            } else {
+                const errors = Array.isArray(data.loi) ? data.loi.join(', ') : data.loi;
+                msg.className = 'msg error';
+                msg.textContent = errors;
+                msg.style.display = 'block';
+            }
+        } catch (e) {
+            msg.className = 'msg error';
+            msg.textContent = 'Không thể kết nối đến server';
+            msg.style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>
