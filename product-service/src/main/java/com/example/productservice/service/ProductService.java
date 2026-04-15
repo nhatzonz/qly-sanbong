@@ -28,4 +28,8 @@ public class ProductService {
     public Product addNewProduct(Product product) {
         return productRepository.save(product);
     }
+
+    public java.util.List<Product> getAll() {
+        return productRepository.findAll();
+    }
 }

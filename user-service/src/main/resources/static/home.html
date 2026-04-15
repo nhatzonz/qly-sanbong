@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 20px; }
+        .staff-info { font-size: 14px; color: #ccc; }
+        .staff-info span { color: #fff; font-weight: bold; }
+        .logout-btn {
+            background: none;
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 16px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover { background: #e63946; border-color: #e63946; color: #fff; }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding: 80px 20px;
+            flex-wrap: wrap;
+        }
+        .menu-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 48px 40px;
+            text-align: center;
+            cursor: pointer;
+            width: 240px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .menu-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .menu-card .icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+        .menu-card h3 {
+            font-size: 18px;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .menu-card p {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .card-customer .icon { color: #4361ee; }
+        .card-import .icon { color: #2ec4b6; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Quản Lý San Bóng</h1>
+    <div style="display:flex;align-items:center;">
+        <span class="staff-info">Nhân viên: <span id="staffName">...</span></span>
+        <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+    </div>
+</header>
+
+<div class="container">
+    <a class="menu-card card-customer" href="/customers.html">
+        <div class="icon">👤</div>
+        <h3>Quản Lý Khách Hàng</h3>
+        <p>Xem danh sách và thêm khách hàng mới</p>
+    </a>
+
+    <a class="menu-card card-import" href="/create-import.html">
+        <div class="icon">📦</div>
+        <h3>Nhập Hàng</h3>
+        <p>Tạo phiếu nhập hàng từ nhà cung cấp</p>
+    </a>
+</div>
+
+<script>
+    const staffName = sessionStorage.getItem('staffName');
+    if (!staffName) {
+        window.location.href = '/login.html';
+    } else {
+        document.getElementById('staffName').textContent = staffName;
+    }
+
+    function logout() {
+        sessionStorage.clear();
+        window.location.href = '/login.html';
+    }
+</script>
+</body>
+</html>

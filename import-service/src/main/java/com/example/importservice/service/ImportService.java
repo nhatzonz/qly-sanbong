@@ -4,6 +4,7 @@ import com.example.importservice.dto.ImportDetailDTO;
 import com.example.importservice.dto.ImportRequestDTO;
 import com.example.importservice.entity.ImportDetail;
 import com.example.importservice.entity.ImportTicket;
+import com.example.importservice.repository.ImportDetailRepository;
 import com.example.importservice.repository.ImportRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,11 @@ import java.util.UUID;
 public class ImportService {
 
     private final ImportRepository importRepository;
+    private final ImportDetailRepository importDetailRepository;
 
-    public ImportService(ImportRepository importRepository) {
+    public ImportService(ImportRepository importRepository, ImportDetailRepository importDetailRepository) {
         this.importRepository = importRepository;
+        this.importDetailRepository = importDetailRepository;
     }
 
     public ImportTicket createImport(ImportRequestDTO dto) {
@@ -52,12 +55,13 @@ public class ImportService {
                 .amount(totalAmount)
                 .createdBy(dto.getCreatedBy())
                 .note(dto.getNote())
-                .details(details)
                 .build();
 
-        ImportTicket saved = importRepository.save(ticket);
+        importRepository.save(ticket);
+        importDetailRepository.saveAll(details);
+
         log.info("[NHAP HANG] Thanh cong - Ma phieu: {}, Tong tien: {}, So san pham: {}",
-                saved.getImportTicketId(), saved.getAmount(), details.size());
-        return saved;
+                ticket.getImportTicketId(), ticket.getAmount(), details.size());
+        return ticket;
     }
 }

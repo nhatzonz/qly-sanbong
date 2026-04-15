@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý khách hàng</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 20px; }
+        .back-btn {
+            background: none;
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #4361ee; border-color: #4361ee; color: #fff; }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 16px; }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .top-bar h2 { font-size: 20px; color: #1a1a2e; }
+        .btn-create {
+            background: #4361ee;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-create:hover { background: #3a52d4; }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #1a1a2e; color: #fff; }
+        th { padding: 14px 16px; font-size: 13px; text-align: left; }
+        td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #f0f0f0; color: #333; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8f9ff; }
+        .empty-msg {
+            text-align: center;
+            padding: 48px;
+            color: #888;
+            font-size: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: #aaa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Quản Lý San Bóng</h1>
+    <a class="back-btn" href="/home.html">← Trang chủ</a>
+</header>
+
+<div class="container">
+    <div class="top-bar">
+        <h2>Danh Sách Khách Hàng</h2>
+        <a class="btn-create" href="/create-customer.html">+ Tạo Khách Hàng</a>
+    </div>
+
+    <div class="card">
+        <div class="loading" id="loading">Đang tải...</div>
+        <table id="customerTable" style="display:none">
+            <thead>
+                <tr>
+                    <th>Mã KH</th>
+                    <th>Họ tên</th>
+                    <th>Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                </tr>
+            </thead>
+            <tbody id="customerBody"></tbody>
+        </table>
+        <div class="empty-msg" id="emptyMsg" style="display:none">Chưa có khách hàng nào.</div>
+    </div>
+</div>
+
+<script>
+    if (!sessionStorage.getItem('staffName')) {
+        window.location.href = '/login.html';
+    }
+
+    fetch('http://localhost:8081/api/customers')
+        .then(r => r.json())
+        .then(list => {
+            document.getElementById('loading').style.display = 'none';
+            if (!list || list.length === 0) {
+                document.getElementById('emptyMsg').style.display = 'block';
+                return;
+            }
+            const tbody = document.getElementById('customerBody');
+            list.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.customerId}</td>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.address}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('customerTable').style.display = 'table';
+        })
+        .catch(() => {
+            document.getElementById('loading').textContent = 'Không thể tải danh sách khách hàng.';
+        });
+</script>
+</body>
+</html>

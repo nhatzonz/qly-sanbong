@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
 @Table(name = "import_tickets")
 @Data
@@ -28,7 +26,4 @@ public class ImportTicket {
     private String createdBy;
 
     private String note;
-
-    @OneToMany(mappedBy = "importTicketId", cascade = CascadeType.ALL)
-    private List<ImportDetail> details;
 }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+            width: 360px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            color: #1a1a2e;
+            font-size: 22px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-bottom: 18px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: #4361ee; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4361ee;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background: #3a52d4; }
+        .error {
+            color: #e63946;
+            font-size: 13px;
+            margin-top: -12px;
+            margin-bottom: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Quản Lý San Bóng</h2>
+    <label for="userName">Tài khoản</label>
+    <input type="text" id="userName" placeholder="Nhập tài khoản" />
+
+    <label for="passWord">Mật khẩu</label>
+    <input type="password" id="passWord" placeholder="Nhập mật khẩu" />
+
+    <p class="error" id="errorMsg">Tài khoản hoặc mật khẩu không đúng</p>
+
+    <button onclick="login()">Đăng nhập</button>
+</div>
+
+<script>
+    async function login() {
+        const userName = document.getElementById('userName').value.trim();
+        const passWord = document.getElementById('passWord').value.trim();
+        const errorMsg = document.getElementById('errorMsg');
+        errorMsg.style.display = 'none';
+
+        if (!userName || !passWord) {
+            errorMsg.textContent = 'Vui lòng nhập đầy đủ thông tin';
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        try {
+            const res = await fetch('http://localhost:8081/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userName, passWord })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                errorMsg.textContent = data.loi || 'Tài khoản hoặc mật khẩu không đúng';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const staff = await res.json();
+            sessionStorage.setItem('staffId', staff.staffId);
+            sessionStorage.setItem('staffName', staff.name);
+            sessionStorage.setItem('staffPhone', staff.phone);
+            window.location.href = '/home.html';
+        } catch (e) {
+            errorMsg.textContent = 'Không thể kết nối đến server';
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter') login();
+    });
+</script>
+</body>
+</html>

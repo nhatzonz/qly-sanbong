@@ -4,7 +4,8 @@ import com.example.productservice.entity.Product;
 import com.example.productservice.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
+
+import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -15,6 +16,11 @@ public class ProductController {
 
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Product>> getAll() {
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @GetMapping("/{productId}/exists")

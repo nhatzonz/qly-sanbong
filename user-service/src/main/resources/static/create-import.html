@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Nhập hàng</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 20px; }
+        .back-btn {
+            background: none;
+            border: 1px solid #ccc;
+            color: #ccc;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background: #2ec4b6; border-color: #2ec4b6; color: #fff; }
+        .container { max-width: 860px; margin: 40px auto; padding: 0 16px; }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+            padding: 36px;
+            margin-bottom: 20px;
+        }
+        h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 24px; }
+        h3 { font-size: 16px; color: #1a1a2e; margin-bottom: 16px; }
+        .row { display: flex; gap: 16px; }
+        .row .field { flex: 1; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #333; font-weight: bold; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 18px;
+            outline: none;
+            transition: border 0.2s;
+            background: #fff;
+        }
+        input:focus, select:focus { border-color: #2ec4b6; }
+        textarea { resize: vertical; min-height: 60px; }
+        .staff-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 18px;
+            display: inline-block;
+        }
+        /* Details table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        th {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 10px 12px;
+            font-size: 13px;
+            text-align: left;
+        }
+        td { padding: 8px 6px; border-bottom: 1px solid #eee; }
+        td input, td select {
+            margin-bottom: 0;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+        .btn-del {
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-add {
+            background: #2ec4b6;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .btn-add:hover { background: #28aaa3; }
+        .total-row {
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+            padding: 8px 0;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #2ec4b6;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #28aaa3; }
+        .msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+        .msg.success { background: #d4edda; color: #155724; }
+        .msg.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Quản Lý San Bóng</h1>
+    <a class="back-btn" href="/home.html">← Trang chủ</a>
+</header>
+
+<div class="container">
+    <!-- Thông tin phiếu -->
+    <div class="card">
+        <h2>Tạo Phiếu Nhập Hàng</h2>
+
+        <div class="staff-badge">Nhân viên: <strong id="staffNameBadge"></strong></div>
+
+        <div class="row">
+            <div class="field">
+                <label for="date">Ngày nhập</label>
+                <input type="date" id="date" />
+            </div>
+            <div class="field">
+                <label for="supplierId">Nhà cung cấp</label>
+                <select id="supplierId">
+                    <option value="">-- Chọn nhà cung cấp --</option>
+                </select>
+            </div>
+        </div>
+
+        <label for="note">Ghi chú</label>
+        <textarea id="note" placeholder="Ghi chú (tuỳ chọn)"></textarea>
+    </div>
+
+    <!-- Chi tiết sản phẩm -->
+    <div class="card">
+        <h3>Chi tiết sản phẩm</h3>
+
+        <button class="btn-add" onclick="addRow()">+ Thêm sản phẩm</button>
+
+        <table id="detailTable">
+            <thead>
+                <tr>
+                    <th style="width:30%">Sản phẩm</th>
+                    <th style="width:15%">Số lượng</th>
+                    <th style="width:20%">Đơn giá (đ)</th>
+                    <th style="width:20%">Thành tiền (đ)</th>
+                    <th style="width:15%"></th>
+                </tr>
+            </thead>
+            <tbody id="detailBody"></tbody>
+        </table>
+
+        <div class="total-row">Tổng tiền: <span id="totalAmount">0</span> đ</div>
+
+        <button class="btn-submit" onclick="submitImport()">Tạo phiếu nhập</button>
+        <div class="msg" id="msg"></div>
+    </div>
+</div>
+
+<script>
+    if (!sessionStorage.getItem('staffName')) {
+        window.location.href = '/login.html';
+    }
+
+    document.getElementById('staffNameBadge').textContent = sessionStorage.getItem('staffName');
+
+    // Set ngày hôm nay
+    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+    let products = [];
+
+    // Load nhà cung cấp
+    fetch('http://localhost:8082/api/suppliers')
+        .then(r => r.json())
+        .then(list => {
+            const sel = document.getElementById('supplierId');
+            list.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.supplierId;
+                opt.textContent = `${s.supplierId} - ${s.name}`;
+                sel.appendChild(opt);
+            });
+        })
+        .catch(() => console.warn('Không load được nhà cung cấp'));
+
+    // Load sản phẩm, rồi mới thêm dòng đầu tiên
+    fetch('http://localhost:8083/api/products')
+        .then(r => r.json())
+        .then(list => {
+            products = list;
+            addRow();
+        })
+        .catch(() => {
+            console.warn('Không load được sản phẩm');
+            addRow();
+        });
+
+    let rowIndex = 0;
+
+    function addRow() {
+        const idx = rowIndex++;
+        const tbody = document.getElementById('detailBody');
+        const tr = document.createElement('tr');
+        tr.id = `row-${idx}`;
+
+        const productOptions = products.map(p =>
+            `<option value="${p.productId}">${p.productId} - ${p.productName}</option>`
+        ).join('');
+
+        tr.innerHTML = `
+            <td>
+                <select id="product-${idx}" onchange="updateSubtotal(${idx})">
+                    <option value="">-- Chọn --</option>
+                    ${productOptions}
+                </select>
+            </td>
+            <td><input type="number" id="qty-${idx}" value="1" min="1" oninput="updateSubtotal(${idx})" /></td>
+            <td><input type="number" id="price-${idx}" value="0" min="0" oninput="updateSubtotal(${idx})" /></td>
+            <td><span id="sub-${idx}">0</span> đ</td>
+            <td><button class="btn-del" onclick="removeRow(${idx})">Xoá</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function removeRow(idx) {
+        const row = document.getElementById(`row-${idx}`);
+        if (row) row.remove();
+        calcTotal();
+    }
+
+    function updateSubtotal(idx) {
+        const qty = parseFloat(document.getElementById(`qty-${idx}`)?.value) || 0;
+        const price = parseFloat(document.getElementById(`price-${idx}`)?.value) || 0;
+        const sub = qty * price;
+        const subEl = document.getElementById(`sub-${idx}`);
+        if (subEl) subEl.textContent = sub.toLocaleString('vi-VN');
+        calcTotal();
+    }
+
+    function calcTotal() {
+        const spans = document.querySelectorAll('[id^="sub-"]');
+        let total = 0;
+        spans.forEach(s => {
+            total += parseFloat(s.textContent.replace(/\./g, '').replace(',', '.')) || 0;
+        });
+        document.getElementById('totalAmount').textContent = total.toLocaleString('vi-VN');
+    }
+
+    async function submitImport() {
+        const date = document.getElementById('date').value;
+        const supplierId = document.getElementById('supplierId').value;
+        const note = document.getElementById('note').value.trim();
+        const createdBy = sessionStorage.getItem('staffId');
+        const msg = document.getElementById('msg');
+        msg.style.display = 'none';
+
+        if (!date || !supplierId) {
+            showMsg('error', 'Vui lòng chọn ngày nhập và nhà cung cấp');
+            return;
+        }
+
+        // Thu thập chi tiết
+        const rows = document.querySelectorAll('[id^="row-"]');
+        if (rows.length === 0) {
+            showMsg('error', 'Phiếu nhập phải có ít nhất 1 sản phẩm');
+            return;
+        }
+
+        const details = [];
+        for (const row of rows) {
+            const idx = row.id.split('-')[1];
+            const productId = document.getElementById(`product-${idx}`)?.value;
+            const quantity = parseInt(document.getElementById(`qty-${idx}`)?.value);
+            const unitPrice = parseFloat(document.getElementById(`price-${idx}`)?.value);
+
+            if (!productId) {
+                showMsg('error', 'Vui lòng chọn sản phẩm cho tất cả các dòng');
+                return;
+            }
+
+            details.push({ productId, quantity, unitPrice });
+        }
+
+        const importTicketId = 'PN' + Date.now();
+
+        const body = { importTicketId, date, supplierId, createdBy, note, details };
+
+        try {
+            // Bước 1: Lưu phiếu nhập
+            const res = await fetch('http://localhost:8084/api/imports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                const errors = Array.isArray(data.loi) ? data.loi.join(', ') : data.loi;
+                showMsg('error', errors || 'Tạo phiếu thất bại');
+                return;
+            }
+
+            // Bước 2: Cập nhật tồn kho từng sản phẩm
+            const productTasks = details.map(async d => {
+                const idx = rows[details.indexOf(d)].id.split('-')[1];
+                const productName = document.getElementById(`product-${idx}`)?.selectedOptions[0]?.textContent?.split(' - ')[1] || '';
+
+                const exists = await fetch(`http://localhost:8083/api/products/${d.productId}/exists`)
+                    .then(r => r.json()).catch(() => false);
+
+                if (exists) {
+                    return fetch(`http://localhost:8083/api/products/${d.productId}/stock?quantity=${d.quantity}`, { method: 'PUT' });
+                } else {
+                    return fetch('http://localhost:8083/api/products', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            productId: d.productId,
+                            productName: productName,
+                            price: d.unitPrice,
+                            unit: d.quantity
+                        })
+                    });
+                }
+            });
+
+            await Promise.all(productTasks);
+
+            showMsg('success', `Tạo phiếu nhập thành công! Mã phiếu: ${data.importTicketId}`);
+            document.getElementById('detailBody').innerHTML = '';
+            document.getElementById('totalAmount').textContent = '0';
+            document.getElementById('note').value = '';
+            rowIndex = 0;
+            addRow();
+        } catch (e) {
+            showMsg('error', 'Không thể kết nối đến server nhập hàng');
+        }
+    }
+
+    function showMsg(type, text) {
+        const msg = document.getElementById('msg');
+        msg.className = `msg ${type}`;
+        msg.textContent = text;
+        msg.style.display = 'block';
+    }
+
+    // Dòng đầu tiên được thêm sau khi products load xong (ở trên)
+</script>
+</body>
+</html>
