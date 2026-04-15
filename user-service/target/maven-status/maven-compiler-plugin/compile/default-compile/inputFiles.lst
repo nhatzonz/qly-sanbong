@@ -12,5 +12,6 @@ D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\entit
 D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\controller\CustomerController.java
 D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\dto\LoginRequestDTO.java
 D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\entity\Customer.java
+D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\filter\LoggingFilter.java
 D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\repository\CustomerRepository.java
 D:\qly-sanbong-mini-prj\user-service\src\main\java\com\example\userservice\service\CustomerService.java

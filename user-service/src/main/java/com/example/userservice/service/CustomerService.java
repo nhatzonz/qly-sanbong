@@ -22,6 +22,11 @@ public class CustomerService {
         log.info("[THEM KHACH HANG] Ma: {}, Ten: {}, SDT: {}, Dia chi: {}",
                 dto.getIdCustomer(), dto.getName(), dto.getPhone(), dto.getAddress());
 
+        if (customerRepository.existsById(dto.getIdCustomer())) {
+            log.warn("[THEM KHACH HANG] Ma {} da ton tai", dto.getIdCustomer());
+            throw new IllegalArgumentException("Mã khách hàng '" + dto.getIdCustomer() + "' đã tồn tại");
+        }
+
         Customer customer = Customer.builder()
                 .customerId(dto.getIdCustomer())
                 .name(dto.getName())
