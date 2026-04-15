@@ -3,10 +3,12 @@ package com.example.customerservice.service;
 import com.example.customerservice.dto.CustomerRequestDTO;
 import com.example.customerservice.entity.Customer;
 import com.example.customerservice.repository.CustomerRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class CustomerService {
 
@@ -17,6 +19,9 @@ public class CustomerService {
     }
 
     public Customer createCustomer(CustomerRequestDTO dto) {
+        log.info("[THEM KHACH HANG] Ma: {}, Ten: {}, SDT: {}, Dia chi: {}",
+                dto.getIdCustomer(), dto.getName(), dto.getPhone(), dto.getAddress());
+
         Customer customer = Customer.builder()
                 .customerId(dto.getIdCustomer())
                 .name(dto.getName())
@@ -24,7 +29,9 @@ public class CustomerService {
                 .address(dto.getAddress())
                 .build();
 
-        return customerRepository.save(customer);
+        Customer saved = customerRepository.save(customer);
+        log.info("[THEM KHACH HANG] Thanh cong - Ma khach hang: {}", saved.getCustomerId());
+        return saved;
     }
 
     public List<Customer> getAllCustomers() {

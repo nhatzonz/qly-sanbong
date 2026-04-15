@@ -23,12 +23,17 @@ public class ImportService {
     }
 
     public ImportTicket createImport(ImportRequestDTO dto) {
+        log.info("[NHAP HANG] Bat dau tao phieu - Ma phieu: {}, NCC: {}, Ngay: {}, Nguoi tao: {}",
+                dto.getImportTicketId(), dto.getSupplierId(), dto.getDate(), dto.getCreatedBy());
+
         List<ImportDetail> details = new ArrayList<>();
         float totalAmount = 0;
 
         for (ImportDetailDTO d : dto.getDetails()) {
             double subTotal = d.getQuantity() * d.getUnitPrice();
             totalAmount += subTotal;
+            log.info("[NHAP HANG] Chi tiet - San pham: {}, So luong: {}, Don gia: {}, Thanh tien: {}",
+                    d.getProductId(), d.getQuantity(), d.getUnitPrice(), subTotal);
 
             details.add(ImportDetail.builder()
                     .detailId(UUID.randomUUID().toString())
@@ -50,6 +55,9 @@ public class ImportService {
                 .details(details)
                 .build();
 
-        return importRepository.save(ticket);
+        ImportTicket saved = importRepository.save(ticket);
+        log.info("[NHAP HANG] Thanh cong - Ma phieu: {}, Tong tien: {}, So san pham: {}",
+                saved.getImportTicketId(), saved.getAmount(), details.size());
+        return saved;
     }
 }
