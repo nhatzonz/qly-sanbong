@@ -29,9 +29,12 @@ public class LoggingFilter implements Filter {
             String reqBody = new String(req.getContentAsByteArray(), StandardCharsets.UTF_8);
             String resBody = new String(res.getContentAsByteArray(), StandardCharsets.UTF_8);
 
+            String queryString = req.getQueryString();
+            String fullUrl = queryString != null ? req.getRequestURI() + "?" + queryString : req.getRequestURI();
+
             log.info("\n>>> REQUEST  {} {}\n    Body: {}\n<<< RESPONSE {}\n    Body: {}",
                     req.getMethod(),
-                    req.getRequestURI(),
+                    fullUrl,
                     reqBody.isBlank() ? "(empty)" : reqBody,
                     res.getStatus(),
                     resBody.isBlank() ? "(empty)" : resBody);
