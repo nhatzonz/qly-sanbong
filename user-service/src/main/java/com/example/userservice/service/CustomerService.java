@@ -22,7 +22,7 @@ public class CustomerService {
         log.info("[THEM KHACH HANG] Ma: {}, Ten: {}, SDT: {}, Dia chi: {}",
                 dto.getIdCustomer(), dto.getName(), dto.getPhone(), dto.getAddress());
 
-        if (customerRepository.existsById(dto.getIdCustomer())) {
+        if (customerRepository.existsByCustomerId(dto.getIdCustomer())) {
             log.warn("[THEM KHACH HANG] Ma {} da ton tai", dto.getIdCustomer());
             throw new IllegalArgumentException("Mã khách hàng '" + dto.getIdCustomer() + "' đã tồn tại");
         }
@@ -35,7 +35,7 @@ public class CustomerService {
                 .build();
 
         Customer saved = customerRepository.save(customer);
-        log.info("[THEM KHACH HANG] Thanh cong - Ma khach hang: {}", saved.getCustomerId());
+        log.info("[THEM KHACH HANG] Thanh cong - Ma khach hang: {}, ID: {}", saved.getCustomerId(), saved.getId());
         return saved;
     }
 

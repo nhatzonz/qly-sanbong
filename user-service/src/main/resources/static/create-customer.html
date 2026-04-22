@@ -114,7 +114,7 @@
         msg.style.display = 'none';
 
         try {
-            const res = await fetch('http://localhost:8081/api/customers', {
+            const res = await fetch('http://localhost:8080/api/customers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idCustomer, name, phone, address })

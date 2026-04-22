@@ -2,6 +2,7 @@ D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\e
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\dto\ImportDetailDTO.java
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\dto\ImportRequestDTO.java
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\filter\LoggingFilter.java
+D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\dto\StaffDTO.java
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\controller\ImportController.java
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\repository\ImportRepository.java
 D:\qly-sanbong-mini-prj\import-service\src\main\java\com\example\importservice\service\ImportService.java

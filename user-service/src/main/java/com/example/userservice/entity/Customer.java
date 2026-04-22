@@ -1,22 +1,21 @@
 package com.example.userservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "customers")
+@PrimaryKeyJoinColumn(name = "id")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Customer {
+@SuperBuilder
+public class Customer extends User {
 
-    @Id
+    @Column(unique = true)
     private String customerId;
 
     private String name;

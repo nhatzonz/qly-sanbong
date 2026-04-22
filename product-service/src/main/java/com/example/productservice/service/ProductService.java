@@ -4,6 +4,7 @@ import com.example.productservice.entity.Product;
 import com.example.productservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class ProductService {
         return productRepository.existsById(productId);
     }
 
+    @Transactional
     public boolean updateStock(String productId, int quantity) {
         return productRepository.findById(productId).map(product -> {
             int truoc = product.getUnit();

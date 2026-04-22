@@ -1,29 +1,27 @@
 package com.example.userservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "staff")
+@PrimaryKeyJoinColumn(name = "id")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Staff {
-
-    @Id
-    private Long userId;
-
-    private String name;
-
-    private String phone;
+@SuperBuilder
+public class Staff extends User {
 
     private String position;
 
+    private double salary;
+
+    private String name;
+
     private String address;
 
-    private double salary;
+    private String phone;
 }

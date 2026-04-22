@@ -2,12 +2,13 @@ package com.example.productservice.controller;
 
 import com.example.productservice.entity.Product;
 import com.example.productservice.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -35,7 +36,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> addNewProduct(@RequestBody Product product) {
-        return ResponseEntity.ok(productService.addNewProduct(product));
+    public ResponseEntity<Product> addNewProduct(@Valid @RequestBody Product product) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.addNewProduct(product));
     }
 }

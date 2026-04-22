@@ -109,7 +109,7 @@
         window.location.href = '/login.html';
     }
 
-    fetch('http://localhost:8081/api/customers')
+    fetch('http://localhost:8080/api/customers')
         .then(r => r.json())
         .then(list => {
             document.getElementById('loading').style.display = 'none';

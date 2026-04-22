@@ -2,6 +2,7 @@ package com.example.importservice.service;
 
 import com.example.importservice.dto.ImportDetailDTO;
 import com.example.importservice.dto.ImportRequestDTO;
+import com.example.importservice.dto.StaffDTO;
 import com.example.importservice.entity.ImportDetail;
 import com.example.importservice.entity.ImportTicket;
 import com.example.importservice.repository.ImportDetailRepository;
@@ -9,6 +10,7 @@ import com.example.importservice.repository.ImportRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -28,18 +30,33 @@ public class ImportService {
     @Value("${product.service.url}")
     private String productServiceUrl;
 
+    @Value("${user.service.url}")
+    private String userServiceUrl;
+
     public ImportService(ImportRepository importRepository, ImportDetailRepository importDetailRepository, RestTemplate restTemplate) {
         this.importRepository = importRepository;
         this.importDetailRepository = importDetailRepository;
         this.restTemplate = restTemplate;
     }
 
+    @Transactional
     public ImportTicket createImport(ImportRequestDTO dto) {
-        log.info("[NHAP HANG] Bat dau tao phieu - Ma phieu: {}, NCC: {}, Ngay: {}, Nguoi tao: {}",
-                dto.getImportTicketId(), dto.getSupplierId(), dto.getDate(), dto.getCreatedBy());
+        log.info("[NHAP HANG] Bat dau tao phieu - Ma phieu: {}, NCC: {}, Ngay: {}, NV ID: {}",
+                dto.getImportTicketId(), dto.getSupplierId(), dto.getDate(), dto.getStaffId());
+
+        // Lay thong tin nhan vien tu UserService
+        StaffDTO staff;
+        try {
+            staff = restTemplate.getForObject(userServiceUrl + "/api/staff/" + dto.getStaffId(), StaffDTO.class);
+            if (staff == null) throw new IllegalArgumentException("Khong tim thay nhan vien");
+            log.info("[NHAP HANG] Nhan vien: {}, Vi tri: {}", staff.getName(), staff.getPosition());
+        } catch (Exception e) {
+            log.error("[NHAP HANG] Loi khi lay thong tin nhan vien ID {}: {}", dto.getStaffId(), e.getMessage());
+            throw new IllegalArgumentException("Không tìm thấy nhân viên ID: " + dto.getStaffId());
+        }
 
         List<ImportDetail> details = new ArrayList<>();
-        float totalAmount = 0;
+        double totalAmount = 0;
 
         for (ImportDetailDTO d : dto.getDetails()) {
             double subTotal = d.getQuantity() * d.getUnitPrice();
@@ -61,18 +78,19 @@ public class ImportService {
 
         ImportTicket ticket = ImportTicket.builder()
                 .importTicketId(dto.getImportTicketId())
+                .staffId(staff.getUserId())
                 .supplierId(dto.getSupplierId())
                 .date(dto.getDate())
                 .amount(totalAmount)
-                .createdBy(dto.getCreatedBy())
+                .createdBy(staff.getName())
                 .note(dto.getNote())
                 .build();
 
         importRepository.save(ticket);
         importDetailRepository.saveAll(details);
 
-        log.info("[NHAP HANG] Thanh cong - Ma phieu: {}, Tong tien: {}, So san pham: {}",
-                ticket.getImportTicketId(), ticket.getAmount(), details.size());
+        log.info("[NHAP HANG] Thanh cong - Ma phieu: {}, Tong tien: {}, So san pham: {}, Nhan vien: {}",
+                ticket.getImportTicketId(), ticket.getAmount(), details.size(), ticket.getCreatedBy());
         return ticket;
     }
 

@@ -17,11 +17,13 @@ public class ImportTicket {
     @Id
     private String importTicketId;
 
+    private Long staffId;
+
     private String supplierId;
 
     private String date;
 
-    private float amount;
+    private double amount;
 
     private String createdBy;
 

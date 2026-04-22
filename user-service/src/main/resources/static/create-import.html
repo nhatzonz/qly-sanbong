@@ -198,7 +198,7 @@
     let products = [];
 
     // Load nhà cung cấp
-    fetch('http://localhost:8082/api/suppliers')
+    fetch('http://localhost:8080/api/suppliers')
         .then(r => r.json())
         .then(list => {
             const sel = document.getElementById('supplierId');
@@ -212,7 +212,7 @@
         .catch(() => console.warn('Không load được nhà cung cấp'));
 
     // Load sản phẩm, rồi mới thêm dòng đầu tiên
-    fetch('http://localhost:8083/api/products')
+    fetch('http://localhost:8080/api/products')
         .then(r => r.json())
         .then(list => {
             products = list;
@@ -287,7 +287,7 @@
         const date = document.getElementById('date').value;
         const supplierId = document.getElementById('supplierId').value;
         const note = document.getElementById('note').value.trim();
-        const createdBy = sessionStorage.getItem('staffId');
+        const staffId = parseInt(sessionStorage.getItem('staffId'));
         const msg = document.getElementById('msg');
         msg.style.display = 'none';
 
@@ -320,11 +320,11 @@
 
         const importTicketId = 'PN' + Date.now();
 
-        const body = { importTicketId, date, supplierId, createdBy, note, details };
+        const body = { importTicketId, date, supplierId, staffId, note, details };
 
         try {
             // Bước 1: Lưu phiếu nhập
-            const res = await fetch('http://localhost:8084/api/imports', {
+            const res = await fetch('http://localhost:8080/api/imports', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -343,13 +343,13 @@
                 const idx = rows[details.indexOf(d)].id.split('-')[1];
                 const productName = document.getElementById(`product-${idx}`)?.selectedOptions[0]?.textContent?.split(' - ')[1] || '';
 
-                const exists = await fetch(`http://localhost:8083/api/products/${d.productId}/exists`)
+                const exists = await fetch(`http://localhost:8080/api/products/${d.productId}/exists`)
                     .then(r => r.json()).catch(() => false);
 
                 if (exists) {
-                    return fetch(`http://localhost:8083/api/products/${d.productId}/stock?quantity=${d.quantity}`, { method: 'PUT' });
+                    return fetch(`http://localhost:8080/api/products/${d.productId}/stock?quantity=${d.quantity}`, { method: 'PUT' });
                 } else {
-                    return fetch('http://localhost:8083/api/products', {
+                    return fetch('http://localhost:8080/api/products', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
