@@ -44,6 +44,11 @@ public class ImportService {
         log.info("[NHAP HANG] Bat dau tao phieu - Ma phieu: {}, NCC: {}, Ngay: {}, NV ID: {}",
                 dto.getImportTicketId(), dto.getSupplierId(), dto.getDate(), dto.getStaffId());
 
+        // Kiem tra trung ma phieu nhap
+        if (importRepository.existsById(dto.getImportTicketId())) {
+            throw new IllegalArgumentException("Mã phiếu nhập '" + dto.getImportTicketId() + "' đã tồn tại");
+        }
+
         // Lay thong tin nhan vien tu UserService
         StaffDTO staff;
         try {

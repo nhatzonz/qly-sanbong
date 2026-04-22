@@ -6,6 +6,7 @@ com\example\importservice\filter\LoggingFilter.class
 com\example\importservice\dto\ImportRequestDTO.class
 com\example\importservice\entity\ImportTicket.class
 com\example\importservice\entity\ImportDetail$ImportDetailBuilder.class
+com\example\importservice\dto\StaffDTO.class
 com\example\importservice\exception\GlobalExceptionHandler.class
 com\example\importservice\service\ImportService.class
 com\example\importservice\controller\ImportController.class
