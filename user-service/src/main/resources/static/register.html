@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký tài khoản</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+            width: 360px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 28px;
+            color: #1a1a2e;
+            font-size: 22px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            margin-bottom: 4px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input:focus { border-color: #4361ee; }
+        .error {
+            color: #e63946;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4361ee;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background: #3a52d4; }
+        button:disabled { background: #a0b0f8; cursor: not-allowed; }
+        .divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+        .login-link a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Đăng Ký Tài Khoản</h2>
+
+    <div class="success" id="successMsg"></div>
+
+    <label for="userName">Tên đăng nhập</label>
+    <input type="text" id="userName" placeholder="Nhập tên đăng nhập" />
+    <p class="error" id="errUserName"></p>
+
+    <label for="passWord">Mật khẩu</label>
+    <input type="password" id="passWord" placeholder="Nhập mật khẩu" />
+    <p class="error" id="errPassWord"></p>
+
+    <label for="confirmPassword">Xác nhận mật khẩu</label>
+    <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" />
+    <p class="error" id="errConfirm"></p>
+
+    <p class="error" id="errGlobal"></p>
+
+    <button id="btnRegister" onclick="register()">Đăng ký</button>
+
+    <hr class="divider">
+    <div class="login-link">
+        Đã có tài khoản? <a href="/login.html">Đăng nhập ngay</a>
+    </div>
+</div>
+
+<script>
+    function showError(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = msg ? 'block' : 'none';
+    }
+
+    function clearErrors() {
+        ['errUserName', 'errPassWord', 'errConfirm', 'errGlobal'].forEach(id => showError(id, ''));
+        document.getElementById('successMsg').style.display = 'none';
+    }
+
+    async function register() {
+        clearErrors();
+
+        const userName = document.getElementById('userName').value.trim();
+        const passWord = document.getElementById('passWord').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+        let hasError = false;
+        if (!userName) { showError('errUserName', 'Vui lòng nhập tên đăng nhập'); hasError = true; }
+        if (!passWord) { showError('errPassWord', 'Vui lòng nhập mật khẩu'); hasError = true; }
+        else if (passWord.length < 6) { showError('errPassWord', 'Mật khẩu ít nhất 6 ký tự'); hasError = true; }
+        if (!confirmPassword) { showError('errConfirm', 'Vui lòng xác nhận mật khẩu'); hasError = true; }
+        else if (passWord && passWord !== confirmPassword) { showError('errConfirm', 'Mật khẩu xác nhận không khớp'); hasError = true; }
+        if (hasError) return;
+
+        const btn = document.getElementById('btnRegister');
+        btn.disabled = true;
+        btn.textContent = 'Đang xử lý...';
+
+        try {
+            const res = await fetch('http://localhost:8080/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userName, passWord, confirmPassword })
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                showError('errGlobal', data.message || data.loi || 'Đăng ký thất bại, vui lòng thử lại');
+                return;
+            }
+
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = 'Đăng ký thành công!';
+            successMsg.style.display = 'block';
+            setTimeout(() => { window.location.href = '/login.html'; }, 2000);
+        } catch (e) {
+            showError('errGlobal', 'Không thể kết nối đến server');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Đăng ký';
+        }
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter') register();
+    });
+</script>
+</body>
+</html>

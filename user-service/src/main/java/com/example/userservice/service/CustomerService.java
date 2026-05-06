@@ -27,6 +27,12 @@ public class CustomerService {
             throw new IllegalArgumentException("Mã khách hàng '" + dto.getIdCustomer() + "' đã tồn tại");
         }
 
+        if (dto.getPhone() != null && !dto.getPhone().isBlank()
+                && customerRepository.existsByPhone(dto.getPhone())) {
+            log.warn("[THEM KHACH HANG] SDT {} da ton tai", dto.getPhone());
+            throw new IllegalArgumentException("Số điện thoại '" + dto.getPhone() + "' đã được đăng ký");
+        }
+
         Customer customer = Customer.builder()
                 .customerId(dto.getIdCustomer())
                 .name(dto.getName())

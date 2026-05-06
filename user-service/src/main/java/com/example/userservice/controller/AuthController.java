@@ -2,6 +2,7 @@ package com.example.userservice.controller;
 
 import com.example.userservice.dto.LoginRequestDTO;
 import com.example.userservice.dto.LoginResponseDTO;
+import com.example.userservice.dto.RegisterRequestDTO;
 import com.example.userservice.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
         LoginResponseDTO response = authService.login(dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponseDTO> register(@Valid @RequestBody RegisterRequestDTO dto) {
+        LoginResponseDTO response = authService.register(dto);
         return ResponseEntity.ok(response);
     }
 }
