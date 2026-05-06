@@ -240,7 +240,12 @@
                 <select id="product-${idx}" onchange="onProductChange(${idx})">
                     <option value="">-- Chọn --</option>
                     ${productOptions}
+                    <option value="__NEW__"> Nhập sản phẩm mới...</option>
                 </select>
+                <div id="new-product-${idx}" style="display:none; margin-top:6px;">
+                    <input type="text" id="new-id-${idx}" placeholder="Mã SP (VD: SP010)" style="margin-bottom:6px;" />
+                    <input type="text" id="new-name-${idx}" placeholder="Tên sản phẩm" />
+                </div>
             </td>
             <td><input type="number" id="qty-${idx}" value="1" min="1" oninput="updateSubtotal(${idx})" /></td>
             <td><input type="number" id="price-${idx}" value="0" min="0" oninput="updateSubtotal(${idx})" /></td>
@@ -257,10 +262,18 @@
     }
 
     function onProductChange(idx) {
-        const productId = document.getElementById(`product-${idx}`).value;
-        const product = products.find(p => p.productId === productId);
-        if (product) {
-            document.getElementById(`price-${idx}`).value = product.price;
+        const selectVal = document.getElementById(`product-${idx}`).value;
+        const newDiv = document.getElementById(`new-product-${idx}`);
+
+        if (selectVal === '__NEW__') {
+            newDiv.style.display = 'block';
+            document.getElementById(`price-${idx}`).value = 0;
+        } else {
+            newDiv.style.display = 'none';
+            const product = products.find(p => p.productId === selectVal);
+            if (product) {
+                document.getElementById(`price-${idx}`).value = product.price;
+            }
         }
         updateSubtotal(idx);
     }
@@ -306,16 +319,31 @@
         const details = [];
         for (const row of rows) {
             const idx = row.id.split('-')[1];
-            const productId = document.getElementById(`product-${idx}`)?.value;
+            const selectVal = document.getElementById(`product-${idx}`)?.value;
             const quantity = parseInt(document.getElementById(`qty-${idx}`)?.value);
             const unitPrice = parseFloat(document.getElementById(`price-${idx}`)?.value);
+
+            let productId, productName;
+
+            if (selectVal === '__NEW__') {
+                productId = document.getElementById(`new-id-${idx}`)?.value.trim();
+                productName = document.getElementById(`new-name-${idx}`)?.value.trim();
+                if (!productId || !productName) {
+                    showMsg('error', 'Vui lòng nhập đầy đủ mã và tên cho sản phẩm mới');
+                    return;
+                }
+            } else {
+                productId = selectVal;
+                productName = document.getElementById(`product-${idx}`)
+                    ?.selectedOptions[0]?.textContent?.split(' - ')[1] || productId;
+            }
 
             if (!productId) {
                 showMsg('error', 'Vui lòng chọn sản phẩm cho tất cả các dòng');
                 return;
             }
 
-            details.push({ productId, quantity, unitPrice });
+            details.push({ productId, productName, quantity, unitPrice });
         }
 
         const importTicketId = 'PN' + Date.now();
@@ -337,32 +365,6 @@
                 showMsg('error', errors || 'Tạo phiếu thất bại');
                 return;
             }
-
-            // Bước 2: Cập nhật tồn kho từng sản phẩm
-            const productTasks = details.map(async d => {
-                const idx = rows[details.indexOf(d)].id.split('-')[1];
-                const productName = document.getElementById(`product-${idx}`)?.selectedOptions[0]?.textContent?.split(' - ')[1] || '';
-
-                const exists = await fetch(`http://localhost:8080/api/products/${d.productId}/exists`)
-                    .then(r => r.json()).catch(() => false);
-
-                if (exists) {
-                    return fetch(`http://localhost:8080/api/products/${d.productId}/stock?quantity=${d.quantity}`, { method: 'PUT' });
-                } else {
-                    return fetch('http://localhost:8080/api/products', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            productId: d.productId,
-                            productName: productName,
-                            price: d.unitPrice,
-                            unit: d.quantity
-                        })
-                    });
-                }
-            });
-
-            await Promise.all(productTasks);
 
             showMsg('success', `Tạo phiếu nhập thành công! Mã phiếu: ${data.importTicketId}`);
             document.getElementById('detailBody').innerHTML = '';
